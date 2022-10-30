@@ -7,7 +7,7 @@ namespace EF.Compiled;
 public class AppDbContext : DbContext
 {
     #region Ctor
-    
+
     public AppDbContext(DbContextOptions options) : base(options)
     {
 
@@ -39,6 +39,8 @@ public class AppDbContext : DbContext
         List<User> usersList = users.GenerateBetween(1, 1);
         builder.Entity<User>().HasData(usersList);
 
+        Console.WriteLine($"User --> Id: {usersList.First().Id} - Email: {usersList.First().Email}");
+
         #endregion
 
         #region Shop
@@ -51,6 +53,8 @@ public class AppDbContext : DbContext
 
         List<Shop> shopList = shop.GenerateBetween(1,1);
         builder.Entity<Shop>().HasData(shopList);
+
+        Console.WriteLine($"Shop --> Id: {shopList.First().Id} - Name: {shopList.First().Name}");
 
         #endregion
 
@@ -66,17 +70,7 @@ public class AppDbContext : DbContext
         List<Product> productList = product.GenerateBetween(100, 100);
         builder.Entity<Product>().HasData(productList);
 
-        #endregion
-
-        #region Location
-
-        Faker<Location> location = new Faker<Location>()
-            .RuleFor(x => x.Locale, f => f.Commerce.Locale)
-            .RuleFor(x => x.ShortDescription, f => f.Address.StreetAddress(true))
-            .RuleFor(x => x.Shop, shopList.First());
-
-        List<Location> locationList = location.GenerateBetween(50, 50);
-        builder.Entity<Location>().HasData(location);
+        Console.WriteLine($"Product --> Id: {productList.First().Id} - Name: {productList.First().Name} - Price: {productList.First().Price}");
 
         #endregion
 
@@ -88,6 +82,22 @@ public class AppDbContext : DbContext
 
         List<Phone> phoneList = phone.GenerateBetween(50, 50);
         builder.Entity<Phone>().HasData(phoneList);
+
+        Console.WriteLine($"Phones --> Id: {phoneList.First().Id} - PhoneNumber: {phoneList.First().PhoneNumber} - HasWhatsApp: {phoneList.First().HasWhatsApp}");
+
+        #endregion
+
+        #region Location
+
+        //Faker<Location> location = new Faker<Location>()
+        //    .RuleFor(x => x.Locale, f => f.Commerce.Locale)
+        //    .RuleFor(x => x.ShortDescription, f => f.Address.StreetAddress(true))
+        //    .RuleFor(x => x.Shop, shopList.First());
+
+        //List<Location> locationList = location.GenerateBetween(50, 50);
+        //builder.Entity<Location>().HasData(locationList);
+
+        //Console.WriteLine($"Location --> Id: {locationList.First().Id} - Locale: {locationList.First().Locale} - ShortDescription: {locationList.First().ShortDescription}");
 
         #endregion
     }

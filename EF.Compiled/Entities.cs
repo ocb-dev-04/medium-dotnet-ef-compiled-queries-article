@@ -5,11 +5,11 @@ namespace EF.Compiled;
 public class Base
 {
     [Key]
-    public Guid Id { get; set; }
+    public Guid Id { get; set; } = Guid.NewGuid();
     public DateTimeOffset Created { get; set; } = DateTimeOffset.UtcNow;
 }
 
-public sealed class User : Base
+public class User : Base
 {
     [Required]
     public string FullName { get; set; }
@@ -26,7 +26,7 @@ public sealed class User : Base
     #endregion
 }
 
-public sealed class Shop : Base
+public class Shop : Base
 {
     [Required]
     public string Name { get; set; }
@@ -38,7 +38,6 @@ public sealed class Shop : Base
     #region Relations
 
     public virtual User Owner { get; set; }
-
     public virtual ICollection<Product> Products { get; set; } = new HashSet<Product>();
     public virtual ICollection<Phone> Phones { get; set; } = new HashSet<Phone>();
     public virtual ICollection<Location> Locations { get; set; } = new HashSet<Location>();
@@ -46,7 +45,7 @@ public sealed class Shop : Base
     #endregion
 }
 
-public sealed class Product : Base
+public class Product : Base
 {
     [Required]
     public string Name { get; set; }
@@ -64,7 +63,7 @@ public sealed class Product : Base
     #endregion
 }
 
-public sealed class Phone : Base
+public class Phone : Base
 {
     [Required]
     public string PhoneNumber { get; set; }
@@ -79,7 +78,7 @@ public sealed class Phone : Base
     #endregion
 }
 
-public sealed class Location : Base
+public class Location : Base
 {
     [Required]
     public string Locale { get; set; }

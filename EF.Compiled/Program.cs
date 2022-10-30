@@ -29,9 +29,11 @@ public class MainBenchmark
         optionsBuilder.UseLazyLoadingProxies();
 
         _context = new AppDbContext(optionsBuilder.Options);
-        var user = await _context.Users.ToListAsync();
+        var users = await _context.Users.ToListAsync();
         var shops = await _context.Shops.ToListAsync();
-        Console.WriteLine("All init");
+
+        Console.WriteLine($"Users count --> {users.Count()}");
+        Console.WriteLine($"Shops count --> {shops.Count()}");
     }
 
     #endregion
