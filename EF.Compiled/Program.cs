@@ -22,25 +22,25 @@ public class MainBenchmark
     #region Init
 
     [GlobalSetup]
-    public async Task Init()
+    public void Init()
     {
         DbContextOptionsBuilder optionsBuilder = new DbContextOptionsBuilder();
         optionsBuilder.UseInMemoryDatabase(nameof(AppDbContext));
         optionsBuilder.UseLazyLoadingProxies();
 
         _context = new AppDbContext(optionsBuilder.Options);
-        var users = await _context.Users.ToListAsync();
-        var shops = await _context.Shops.ToListAsync();
-
-        Console.WriteLine($"Users count --> {users.Count()}");
-        Console.WriteLine($"Shops count --> {shops.Count()}");
+        
     }
 
     #endregion
 
     [Benchmark]
-    public void Ex() { }
+    public async Task Ex() {
+        await _context.Shops.Where(w => w.Name.Contains("A")).ToListAsync();
+    }
 
     [Benchmark]
-    public void Ex_Compiled() { }
+    public async Task Ex_Compiled() {
+        await _context.Users.Where(w => w.Email.Contains("@")).ToListAsync();
+    }
 }
