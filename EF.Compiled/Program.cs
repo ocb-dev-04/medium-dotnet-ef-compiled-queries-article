@@ -33,43 +33,35 @@ public class MainBenchmark
 
     #endregion
 
-    #region Get By Id
+    #region Generic Repository
 
     [Benchmark]
-    public async Task<Shop> GetbyId_GenericAsync()
-        => await _genericRepository.GetById(shopId);
-
-    [Benchmark]
-    public async Task<Shop> GetbyId_DedicatedAsync()
-        => await _shopRepository.GetById(shopId);
-
-    [Benchmark]
-    public Shop GetbyId_Dedicated_Compiled()
-        => _shopRepository.GetByIdCompiled(shopId);
-
-    [Benchmark]
-    public async Task<Shop> GetbyId_Dedicated_CompiledAsync()
-        => await _shopRepository.GetByIdCompiledAsync(shopId);
-
-    #endregion
-
-    #region Get Collection
-
-    [Benchmark]
-    public async Task<HashSet<Shop>> GetbyCollection_GenericAsync()
+    public async Task<List<Shop>> GetCollection_GenericAsync()
         => await _genericRepository.GetCollection();
 
     [Benchmark]
-    public async Task<HashSet<Shop>> GetbyCollection_DedicatedAsync()
+    public List<Shop> GetCollection_Generic_CompiledSync()
+        => _genericRepository.GetCollection_Compiled();
+
+    [Benchmark]
+    public async Task<List<Shop>> GetCollection_Generic_CompiledAsync()
+        => await _genericRepository.GetCollection_CompiledAsync();
+
+    #endregion
+
+    #region Dedicated Repository
+
+    [Benchmark]
+    public async Task<List<Shop>> GetCollection_DedicatedAsync()
         => await _shopRepository.GetCollection();
 
     [Benchmark]
-    public HashSet<Shop> GetbyCollection_Dedicated_Compiled()
-        => _shopRepository.GetCollectionCompiled();
+    public List<Shop> GetCollection_Dedicated_CompiledSync()
+        => _shopRepository.GetCollection_Compiled();
 
     [Benchmark]
-    public async Task<HashSet<Shop>> GetbyCollection_Dedicated_CompiledAsync()
-        => await _shopRepository.GetCollectionCompiledAsync();
+    public async Task<List<Shop>> GetCollection_Dedicated_CompiledAsync()
+        => await _shopRepository.GetCollection_CompiledAsync();
 
     #endregion
 }

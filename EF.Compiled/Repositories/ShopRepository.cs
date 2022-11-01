@@ -6,56 +6,37 @@ internal class ShopRepository : BaseRepository
 {
     #region Compiled Queries
 
-    private static Func<AppDbContext, Guid, Shop> _getByIdCompiled =
-            EF.CompileQuery((AppDbContext context, Guid id)
-                => context.Shops.Find(id));
-
-    private static Func<AppDbContext, Guid, Task<Shop>> _getByIdAsyncCompiled =
-            EF.CompileAsyncQuery((AppDbContext context, Guid id)
-                => context.Shops.Find(id));
-
     private static Func<AppDbContext, List<Shop>> _getCollectionCompiled =
             EF.CompileQuery((AppDbContext context)
-                => context.Shops.ToList());
+                => context.Shops.AsNoTracking().ToList());
 
-    private static Func<AppDbContext, Task<List<Shop>>> _getCollectionAsyncCompiled =
-            EF.CompileAsyncQuery((AppDbContext context)
-                => context.Shops.ToList());
+    private static Func<AppDbContext, IAsyncEnumerable<Shop>> _getCollectionCompiledAsync = 
+        EF.CompileAsyncQuery((AppDbContext context) 
+            => context.Shops.AsNoTracking());
 
     #endregion
-    
+
     #region Ctor
 
     public ShopRepository(AppDbContext context) : base(context)
     {
-
     }
 
     #endregion
 
-    #region General
+    public async Task<List<Shop>> GetCollection()
+        => await _context.Shops.ToListAsync();
 
-    public async Task<Shop> GetById(Guid id)
-        => await _context.Shops.FindAsync(id);
+    public List<Shop> GetCollection_Compiled()
+        => _getCollectionCompiled(_context);
 
-    public async Task<HashSet<Shop>> GetCollection()
-        => (await _context.Set<Shop>().ToListAsync()).ToHashSet();
+    public async Task<List<Shop>> GetCollection_CompiledAsync()
+    {
+        List<Shop> results = new();
+        IAsyncEnumerable<Shop> items = _getCollectionCompiledAsync(_context);
+        await foreach (Shop item in items.ConfigureAwait(true))
+            results.Add(item);
 
-    #endregion
-    
-    #region Compiled
-
-    public Shop GetByIdCompiled(Guid id)
-    => _getByIdCompiled(_context, id);
-
-    public async Task<Shop> GetByIdCompiledAsync(Guid id)
-    => await _getByIdAsyncCompiled(_context, id);
-
-    public HashSet<Shop> GetCollectionCompiled()
-        => _getCollectionCompiled(_context).ToHashSet();
-    
-    public async Task<HashSet<Shop>> GetCollectionCompiledAsync()
-        => (await _getCollectionAsyncCompiled(_context)).ToHashSet();
-
-    #endregion
+        return results;
+    }
 }
