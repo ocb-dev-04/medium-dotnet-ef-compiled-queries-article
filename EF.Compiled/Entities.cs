@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace EF.Compiled;
+namespace EFCore.Compiled;
 
 public class Base
 {

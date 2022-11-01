@@ -1,11 +1,9 @@
-﻿using System.Linq.Expressions;
-
-using Microsoft.EntityFrameworkCore;
-
-using EF.Compiled;
+﻿using EFCore.Compiled;
 
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Attributes;
+
+using EFCore.Compiled.Repositories;
 
 BenchmarkRunner.Run<MainBenchmark>();
 
@@ -14,10 +12,10 @@ public class MainBenchmark
 {
     #region Props
 
-    private AppDbContext _context;
+    private GenericRepository<Shop> _genericRepository;
+    private ShopRepository _shopRepository;
 
-    private static readonly Expression<Func<Shop, bool>> s_NameExpression = e => e.Name.ToLower().Contains("a");
-    private static readonly Func<Shop, bool> s_NameExpressionCompiled = s_NameExpression.Compile();
+    private Guid shopId;
 
     #endregion
 
@@ -26,44 +24,52 @@ public class MainBenchmark
     [GlobalSetup]
     public async Task Init()
     {
-        _context = await Initializer.Run();
+        AppDbContext _context = await Initializer.Run();
+        _genericRepository = new GenericRepository<Shop>(_context);
+        _shopRepository = new ShopRepository(_context);
+
+        shopId = (await _genericRepository.GetCollection()).First().Id;
     }
 
     #endregion
 
-    [Benchmark]
-    public async Task Ex()
-    {
-        await _context.Shops.Where(s_NameExpression).ToListAsync();
-    }
+    #region Get By Id
 
     [Benchmark]
-    public async Task Ex_Compiled()
-    {
-        _context.Shops.Where(s_NameExpressionCompiled).ToList();
-    }
+    public async Task<Shop> GetbyId_GenericAsync()
+        => await _genericRepository.GetById(shopId);
 
     [Benchmark]
-    public async Task Ex_SelectFirst()
-    {
-        await _context.Shops.Select(s => new Shop { Name = s.Name }).Where(s_NameExpression).ToListAsync();
-    }
+    public async Task<Shop> GetbyId_DedicatedAsync()
+        => await _shopRepository.GetById(shopId);
 
     [Benchmark]
-    public async Task Ex_Compiled_SelectFirst()
-    {
-        _context.Shops.Select(s => new Shop { Name = s.Name }).Where(s_NameExpressionCompiled).ToList();
-    }
-    
-    [Benchmark]
-    public async Task Ex_SelectLast()
-    {
-        await _context.Shops.Where(s_NameExpression).Select(s => new Shop { Name = s.Name }).ToListAsync();
-    }
+    public Shop GetbyId_Dedicated_Compiled()
+        => _shopRepository.GetByIdCompiled(shopId);
 
     [Benchmark]
-    public async Task Ex_Compiled_SelectLast()
-    {
-        _context.Shops.Where(s_NameExpressionCompiled).Select(s => new { Name = s.Name }).ToList();
-    }
+    public async Task<Shop> GetbyId_Dedicated_CompiledAsync()
+        => await _shopRepository.GetByIdCompiledAsync(shopId);
+
+    #endregion
+
+    #region Get Collection
+
+    [Benchmark]
+    public async Task<HashSet<Shop>> GetbyCollection_GenericAsync()
+        => await _genericRepository.GetCollection();
+
+    [Benchmark]
+    public async Task<HashSet<Shop>> GetbyCollection_DedicatedAsync()
+        => await _shopRepository.GetCollection();
+
+    [Benchmark]
+    public HashSet<Shop> GetbyCollection_Dedicated_Compiled()
+        => _shopRepository.GetCollectionCompiled();
+
+    [Benchmark]
+    public async Task<HashSet<Shop>> GetbyCollection_Dedicated_CompiledAsync()
+        => await _shopRepository.GetCollectionCompiledAsync();
+
+    #endregion
 }

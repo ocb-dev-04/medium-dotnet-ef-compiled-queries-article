@@ -2,7 +2,7 @@
 using Bogus.Extensions;
 using Microsoft.EntityFrameworkCore;
 
-namespace EF.Compiled;
+namespace EFCore.Compiled;
 
 public class AppDbContext : DbContext
 {

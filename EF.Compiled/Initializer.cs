@@ -2,10 +2,14 @@
 using Bogus.Extensions;
 using Microsoft.EntityFrameworkCore;
 
-namespace EF.Compiled;
+namespace EFCore.Compiled;
 
 internal class Initializer
 {
+    /// <summary>
+    /// Make DbContext, seed data and return context
+    /// </summary>
+    /// <returns></returns>
     public static async Task<AppDbContext> Run()
     {
         DbContextOptionsBuilder optionsBuilder = new DbContextOptionsBuilder();
@@ -41,7 +45,7 @@ internal class Initializer
             .RuleFor(x => x.LogoUrl, f => f.Image.Image())
             .RuleFor(x => x.Owner, usersList.First());
 
-        List<Shop> shopList = shop.GenerateBetween(1, 1);
+        List<Shop> shopList = shop.GenerateBetween(20, 20);
         await context.Shops.AddRangeAsync(shopList);
         await context.SaveChangesAsync();
 
